@@ -3,8 +3,13 @@ package kaka.com.jbox2dapp.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import org.jbox2d.dynamics.Body;
+
+import kaka.com.jbox2dapp.R;
 
 /**
  * Created by kaka on 2017/7/25.

@@ -25,11 +25,11 @@ import kaka.com.jbox2dapp.R;
 public class JboxImpl {
 
     private World mWorld; //模拟世界
-    private float dt = 1f/60f; //模拟世界的频率
+    private float dt = 1f / 60f; //模拟世界的频率
     private int mVelocityIterations = 5; //速率迭代器
     private int mPosiontIterations = 20; //迭代次数
     //世界的长宽
-    private int mWidth,mHeight;
+    private int mWidth, mHeight;
     //密度大小
     private float mDesity = 0.5f;
     private float mRatio = 50;//坐标映射比例
@@ -41,6 +41,7 @@ public class JboxImpl {
 
     /**
      * 设置世界的宽高
+     *
      * @param width
      * @param height
      */
@@ -52,7 +53,7 @@ public class JboxImpl {
     /**
      * 开始世界
      */
-    public void startWorld(){
+    public void startWorld() {
         if (mWorld != null) {
             mWorld.step(dt, mVelocityIterations, mPosiontIterations);
         }
@@ -63,7 +64,8 @@ public class JboxImpl {
      */
     public void createWorld() {
         if (mWorld == null) {
-            mWorld = new World(new Vec2(0, 10.0f));
+            mWorld = new World(new Vec2(0, 1));
+            mWorld.setAutoClearForces(true);
             updateVertiacalBounds();
             updateHorizontalBounds();
         }
@@ -88,6 +90,7 @@ public class JboxImpl {
         fixtureDef.density = mDesity;
         fixtureDef.friction = 0.8f;//摩擦系数
         fixtureDef.restitution = 0.5f; //补偿系数
+        fixtureDef.setSensor(false);
 
         bodyDef.position.set(0, -boxHeight);
         Body topBody = mWorld.createBody(bodyDef); //创建一个真实的上边 body
@@ -95,8 +98,11 @@ public class JboxImpl {
 
         bodyDef.position.set(0, switchPositionToBody(mHeight) + boxHeight);
         Body bottomBody = mWorld.createBody(bodyDef);//创建一个真实的下边 body
+        bottomBody.setLinearDamping(0.0f);
+        bottomBody.setAngularDamping(0.1f);
         bottomBody.createFixture(fixtureDef);
     }
+
     /**
      * 创建世界的左右边界，这里左右边界是一个静止的刚体
      */
@@ -138,27 +144,29 @@ public class JboxImpl {
         bodyDef.position.set(switchPositionToBody( view.getX() + (view.getWidth() / 2) )
                 ,switchPositionToBody(view.getY() + (view.getHeight() / 2))  );
 
-        Shape shape = null;
-        Boolean isCircle = (Boolean) view.getTag(R.id.dn_view_circle_tag);
-        if (isCircle != null && isCircle) {
-            shape = craeteCircleShape( switchPositionToBody(view.getWidth() / 2) );
-        } else {
-            Log.i("kaka","createBody veiw tag is not circle!!!");
-            return;
-        }
+        PolygonShape shape = new PolygonShape();
+        float a = (view.getWidth() / 2) * 0.02f;
+        shape.set(new Vec2[]{
+                new Vec2(0, -a),
+                new Vec2(-a, a),
+                new Vec2(a, a),
+        }, 3);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.setShape(shape);
         fixtureDef.friction = 0.8f;//摩擦系数
-        fixtureDef.density = mDesity;
+        fixtureDef.density = mDesity * 10;
         fixtureDef.restitution = 0.5f;//补偿系数
+        fixtureDef.setSensor(false);
 
         Body body = mWorld.createBody(bodyDef);
+        body.setGravityScale(2f);
         body.createFixture(fixtureDef);
         view.setTag(R.id.dn_view_body_tag, body);
 
         body.setLinearVelocity(new Vec2(mRandom.nextFloat(), mRandom.nextFloat()));
 
     }
+
     //view坐标映射为物理的坐标
     private float switchPositionToBody(float viewPosition) {
         return viewPosition / mRatio;
@@ -168,6 +176,7 @@ public class JboxImpl {
     private float switchPositionToView(float bodyPosition) {
         return bodyPosition * mRatio;
     }
+
     public boolean isBodyView(View view) {
         Body body = (Body) view.getTag(R.id.dn_view_body_tag);
         return body != null;
@@ -176,6 +185,7 @@ public class JboxImpl {
 
     /**
      * 将形状画到屏幕上的屏幕x坐标
+     *
      * @param view
      * @return
      */
@@ -186,21 +196,24 @@ public class JboxImpl {
         }
         return 0;
     }
+
     /**
      * 将形状画到屏幕上的屏幕y坐标
+     *
      * @param view
      * @return
      */
     public float getViewY(View view) {
         Body body = (Body) view.getTag(R.id.dn_view_body_tag);
         if (body != null) {
-            return switchPositionToView(body.getPosition().y ) - (view.getHeight() / 2);
+            return switchPositionToView(body.getPosition().y) - (view.getHeight() / 2);
         }
         return 0;
     }
 
     /**
      * 获取刚体的旋转弧度
+     *
      * @param view
      * @return
      */
@@ -208,14 +221,14 @@ public class JboxImpl {
         Body body = (Body) view.getTag(R.id.dn_view_body_tag);
         if (body != null) {
             float angle = body.getAngle();
-            return  (angle / 3.14f * 180f) % 360;
+            return (angle / 3.14f * 180f) % 360;
         }
         return 0;
     }
 
     public void applyLinearImpulse(float x, float y, View view) {
         Body body = (Body) view.getTag(R.id.dn_view_body_tag);
-        Vec2 impluse = new Vec2(x,y);
+        Vec2 impluse = new Vec2(x, y);
         body.applyLinearImpulse(impluse, body.getPosition(), true); //给body做线性运动 true 运动完之后停止
     }
 
