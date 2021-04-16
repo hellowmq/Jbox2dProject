@@ -153,10 +153,9 @@ public class JboxImpl {
         }, 3);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.setShape(shape);
-        fixtureDef.friction = 0.8f;//摩擦系数
-        fixtureDef.density = mDesity * 10;
-        fixtureDef.restitution = 0.5f;//补偿系数
-        fixtureDef.setSensor(false);
+        fixtureDef.friction = 1f;//摩擦系数
+        fixtureDef.density = mDesity * 50;
+        fixtureDef.restitution = 0.3f;//补偿系数
 
         Body body = mWorld.createBody(bodyDef);
         body.setGravityScale(2f);

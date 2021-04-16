@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -47,9 +46,10 @@ public class FirstActivity extends AppCompatActivity implements SensorEventListe
             ImageView imageView = new ImageView(this);
             imageView.setImageResource(imgArr[i % 5]);
             imageView.setTag(R.id.dn_view_circle_tag, true);
-            jboxView.addView(imageView,layoutParams);
+            jboxView.addView(imageView, layoutParams);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +71,11 @@ public class FirstActivity extends AppCompatActivity implements SensorEventListe
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0] * 4f;
-            float y = event.values[1] * 4f;
+            float x = event.values[0] * 2f;
+            float y = event.values[1] * 2f;
+            if (Math.abs(x) + Math.abs(y) < 5f) {
+                return;
+            }
             jboxView.onSensorChanged(-x, y);
         }
     }

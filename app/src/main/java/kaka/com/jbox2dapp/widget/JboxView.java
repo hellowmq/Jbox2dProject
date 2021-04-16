@@ -32,7 +32,7 @@ public class JboxView extends FrameLayout{
     }
 
     private void intView() {
-        jboxImpl = new JboxImpl(getResources().getDisplayMetrics().density);
+        jboxImpl = new JboxImpl(1f);
     }
 
     @Override
